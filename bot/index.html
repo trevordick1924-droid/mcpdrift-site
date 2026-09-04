@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About the mcpdrift crawler</title>
+<style>
+:root { color-scheme: light dark; }
+body {
+  max-width: 42rem; margin: 0 auto; padding: 3rem 1.25rem 6rem;
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 2rem; }
+h2 { font-size: 1.05rem; margin: 2.5rem 0 .75rem; letter-spacing: .01em; }
+p, li { margin: 0 0 1rem; }
+ul { padding-left: 1.25rem; }
+code {
+  font: .875em/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  padding: .1em .35em; border-radius: 3px;
+}
+pre {
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  padding: .9rem 1rem; border-radius: 6px; overflow-x: auto;
+}
+pre code { background: none; padding: 0; }
+</style>
+</head>
+<body>
+<h1>About the mcpdrift crawler</h1>
+<h2>What it does</h2>
+<p>mcpdrift watches public MCP servers for changes to their tool schemas, so that teams whose agents depend on those tools find out when the contract moves.</p>
+<p>The crawler identifies itself as:</p>
+<pre><code>User-Agent: mcpdrift/0.1 (+https://mcpdrift.dev/bot)</code></pre>
+<h2>What it requests</h2>
+<p>Discovery methods only, over HTTP:</p>
+<ul>
+  <li><code>initialize</code></li>
+  <li><code>tools/list</code></li>
+  <li><code>resources/list</code></li>
+  <li><code>prompts/list</code></li>
+</ul>
+<p><strong>It never calls <code>tools/call</code>.</strong> No tool on a monitored server is ever invoked. This is not a policy we remember to follow: the client object mcpdrift uses has no method capable of invoking a tool, so doing it would take a deliberate code change rather than a slip.</p>
+<p>It reads only what the server publishes to any unauthenticated client. It does not authenticate, does not attempt to discover private servers, and does not probe anything outside the four methods above.</p>
+<h2>Rate</h2>
+<p>One poll per server per day by default. Each server's poll time is derived from its own identifier, so requests are spread across the day rather than issued on the hour, and it polls at the same time each day rather than drifting. Concurrency is limited to one request at a time per host.</p>
+<p>No conditional-request mechanism is used: MCP discovery is a JSON-RPC POST, and HTTP entity tags do not meaningfully apply to it. If a way to skip unchanged manifests at the transport layer becomes available, this page will say so once the code does it, not before.</p>
+<h2>Opting out</h2>
+<p>Mail <code>opt-out@mcpdrift.dev</code> with your server's endpoint and it stops being polled. No justification needed and no reply required to take effect.</p>
+<h2>Corrections</h2>
+<p>Every published item links the evidence it was derived from. If an item is wrong, mail <code>corrections@mcpdrift.dev</code> and it will be corrected or withdrawn.</p>
+<h2>Known limits</h2>
+<p>The false-positive sources this system knows about, and what it does about each, are maintained in the repository. They are <strong>not yet published</strong>: no public surface exists until mcpdrift has measured how often MCP servers actually break, and a limitations page is still a public surface. Mail <code>corrections@mcpdrift.dev</code> and the current list will be sent to you.</p>
+<p>It is maintained as a list of things that are wrong with the detector, not as marketing.</p>
+</body>
+</html>
